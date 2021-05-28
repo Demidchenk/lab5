@@ -1,7 +1,11 @@
 ﻿#include "Header1.h"
-#include <iostream>
+
+using namespace std;
 
 int main()
 {
-    std::cout << "Hello World!\n";
+    ifstream input("ukraine_poi.csv");
+    double lat, lon, n;
+    cin >> lat >> lon >> n;
+
 }
