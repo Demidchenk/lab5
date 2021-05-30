@@ -49,5 +49,18 @@ void rtree::makeTree(ifstream input)
     adr = temp.substr(0, temp.find(';'));
 
     point p(lon, lat, typ, styp, nam, adr);
-    
+    this->insert(p);
+}
+
+double distance(double x1, double x2, double y1, double y2)
+{
+    double R = 6371e3;
+    double lat1 = x1 * M_PI / 180;
+    double lat2 = x2 * M_PI / 180;
+    double dlat = (x2 - x1) * M_PI / 180;
+    double dlon = (y2 - y1) * M_PI / 180;
+    double a = sin(dlat / 2) * sin(dlat / 2) + cos(lat1) * cos(lat2) * sin(dlon / 2) * sin(dlon / 2);
+    double c = 2 * atan2(sqrt(a), sqrt(1 - a));
+
+    return R * c;
 }

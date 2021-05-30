@@ -3,6 +3,8 @@
 #include <vector>
 #include <fstream>
 #include <string>
+#define _USE_MATH_DEFINES
+#include <math.h>
 
 using namespace std;
 
@@ -29,3 +31,5 @@ public:
 
 	point(double x1, double y1, string typ, string styp, string nam, string adr) : x(x1), y(y1) , type(typ), subtype(styp), name(nam), adress(adr){};
 };
+
+double distance(double x1, double x2, double y1, double y2);
