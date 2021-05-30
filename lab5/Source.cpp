@@ -28,8 +28,9 @@ void rtree::insert(point p)
     return;
 }
 
-void rtree::makeTree(ifstream input)
+void rtree::makeTree(string fileName)
 {
+    ifstream input(fileName);
 	double lon, lat;
 	string typ, styp, nam, adr, temp;
 	getline(input, temp);
@@ -52,7 +53,53 @@ void rtree::makeTree(ifstream input)
     this->insert(p);
 }
 
-double distance(double x1, double x2, double y1, double y2)
+void rtree::findPoints(double x, double y, double radius, string type, vector<point> result)
+{
+    for (int i = 0; i < points.size(); i++)
+        if (distance(x, y, points[i].x, points[i].y) && points[i].type == type)
+            result.push_back(points[i]);
+    if (isDivided)
+    {
+        if (distance(x, y, (x1 + x2) / 2, (y1 + y2) / 2) < radius)
+        {
+            northeast->findPoints(x, y, radius, type, result);
+            northwest->findPoints(x, y, radius, type, result);
+            southeast->findPoints(x, y, radius, type, result);
+            southwest->findPoints(x, y, radius, type, result);
+            return;
+        }
+        if (pointInRectangle(x, y, northeast->x1, northeast->y1, northeast->x2, northeast->y2))
+        {
+            northeast->findPoints(x, y, radius, type, result);
+            if (y-(radius/111.2) < southeast->y2) southeast->findPoints(x, y, radius, type, result);
+            if (x-(radius/111.2/cos(y*M_PI/180)) < northwest->x2) northwest->findPoints(x, y, radius, type, result);
+            return;
+        }
+        if (pointInRectangle(x, y, southeast->x1, southeast->y1, southeast->x2, southeast->y2))
+        {
+            southeast->findPoints(x, y, radius, type, result);
+            if (y + (radius / 111.2) > northeast->y1) northeast->findPoints(x, y, radius, type, result);
+            if (x - (radius / 111.2 / cos(y * M_PI / 180)) < southwest->x2) southwest->findPoints(x, y, radius, type, result);
+            return;
+        }
+        if (pointInRectangle(x, y, northwest->x1, northwest->y1, northwest->x2, northwest->y2))
+        {
+            northwest->findPoints(x, y, radius, type, result);
+            if (y - (radius / 111.2) < southwest->y2) southwest->findPoints(x, y, radius, type, result);
+            if (x + (radius / 111.2 / cos(y * M_PI / 180)) > northeast->x1) northeast->findPoints(x, y, radius, type, result);
+            return;
+        }
+        if (pointInRectangle(x, y, southwest->x1, southwest->y1, southwest->x2, southwest->y2))
+        {
+            southwest->findPoints(x, y, radius, type, result);
+            if (y + (radius / 111.2) > northwest->y1) northwest->findPoints(x, y, radius, type, result);
+            if (x + (radius / 111.2 / cos(y * M_PI / 180)) > southeast->x1) southeast->findPoints(x, y, radius, type, result);
+            return;
+        }
+    }
+}
+
+double distance(double x1, double y1, double x2, double y2)
 {
     double R = 6371e3;
     double lat1 = x1 * M_PI / 180;
@@ -63,4 +110,10 @@ double distance(double x1, double x2, double y1, double y2)
     double c = 2 * atan2(sqrt(a), sqrt(1 - a));
 
     return R * c;
+}
+
+bool pointInRectangle(double pointx, double pointy, double x1, double y1, double x2, double y2)
+{
+    if (pointx >= x1 && pointx <= x2 && pointy >= y1 && pointy <= y2) return true;
+    return false;
 }
