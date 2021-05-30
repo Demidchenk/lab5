@@ -21,10 +21,10 @@ void rtree::insert(point p)
         southwest = new rtree(x1, y1, (x1 + x2) / 2, (y1 + y2) / 2);
         isDivided = true;
     }
-    northeast->insert(p);
-    northwest->insert(p);
-    southeast->insert(p);
-    southwest->insert(p);
+    if (p.x > (x1+x2)/2 && p.y > (y1+y2)/2) northeast->insert(p);
+    if (p.x < (x1 + x2) / 2 && p.y > (y1 + y2) / 2) northwest->insert(p);
+    if (p.x > (x1 + x2) / 2 && p.y < (y1 + y2) / 2) southeast->insert(p);
+    if (p.x < (x1 + x2) / 2 && p.y < (y1 + y2) / 2) southwest->insert(p);
     return;
 }
 
@@ -33,31 +33,36 @@ void rtree::makeTree(string fileName)
     ifstream input(fileName);
 	double lon, lat;
 	string typ, styp, nam, adr, temp;
-	getline(input, temp);
+    getline(input, temp);
+    do
+    {
+        while (temp.find(',') != -1)
+            temp[temp.find(',')] = '.';
+        lat = stod(temp.substr(0, temp.find(';')));
+        temp = temp.substr(temp.find(';') + 1);
+        lon = stod(temp.substr(0, temp.find(';')));
+        temp = temp.substr(temp.find(';') + 1);
+        typ = temp.substr(0, temp.find(';'));
+        temp = temp.substr(temp.find(';') + 1);
+        styp = temp.substr(0, temp.find(';'));
+        temp = temp.substr(temp.find(';') + 1);
+        nam = temp.substr(0, temp.find(';'));
+        temp = temp.substr(temp.find(';') + 1);
+        adr = temp.substr(0, temp.find(';'));
 
-    while (temp.find(',') != -1)
-        temp[temp.find(',')] = '.';
-    lat = stod(temp.substr(0, temp.find(';')));
-    temp = temp.substr(temp.find(';') + 1);
-    lon = stod(temp.substr(0, temp.find(';')));
-    temp = temp.substr(temp.find(';') + 1);
-    typ = temp.substr(0, temp.find(';'));
-    temp = temp.substr(temp.find(';') + 1);
-    styp = temp.substr(0, temp.find(';'));
-    temp = temp.substr(temp.find(';') + 1);
-    nam = temp.substr(0, temp.find(';'));
-    temp = temp.substr(temp.find(';') + 1);
-    adr = temp.substr(0, temp.find(';'));
-
-    point p(lon, lat, typ, styp, nam, adr);
-    this->insert(p);
+        point p(lat, lon, typ, styp, nam, adr);
+        this->insert(p);
+        getline(input, temp);
+    } while (!input.eof() && temp != "");
 }
 
-void rtree::findPoints(double x, double y, double radius, string type, vector<point> result)
+void rtree::findPoints(double x, double y, double radius, string type, vector<point> &result)
 {
     for (int i = 0; i < points.size(); i++)
-        if (distance(x, y, points[i].x, points[i].y) && points[i].type == type)
+    {
+        if (distance(x, y, points[i].x, points[i].y) <= radius && points[i].type == type)
             result.push_back(points[i]);
+    }
     if (isDivided)
     {
         if (distance(x, y, (x1 + x2) / 2, (y1 + y2) / 2) < radius)
@@ -101,7 +106,7 @@ void rtree::findPoints(double x, double y, double radius, string type, vector<po
 
 double distance(double x1, double y1, double x2, double y2)
 {
-    double R = 6371e3;
+    double R = 6371;
     double lat1 = x1 * M_PI / 180;
     double lat2 = x2 * M_PI / 180;
     double dlat = (x2 - x1) * M_PI / 180;

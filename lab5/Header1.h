@@ -23,15 +23,15 @@ public:
 	double x1, y1, x2, y2;
 	rtree* northeast, * northwest, * southeast, * southwest;
 	vector<point> points;
-	int capacity = 4;
+	int capacity = 10;
 	bool isDivided = false;
 
 	rtree(double X1, double Y1, double X2, double Y2) : x1(X1), y1(Y1), x2(X2), y2(Y2) {};
 
 	void insert(point p);
 	void makeTree(string fileName);
-	void findPoints(double x, double y, double radius, string type, vector<point> result);
+	void findPoints(double x, double y, double radius, string type, vector<point> &result);
 };
 
-double distance(double x1, double x2, double y1, double y2);
+double distance(double x1, double y1, double x2, double y2);
 bool pointInRectangle(double pointx, double pointy, double x1, double y1, double x2, double y2);
