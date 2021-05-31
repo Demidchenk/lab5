@@ -23,6 +23,7 @@ public:
 	double x1, y1, x2, y2;
 	rtree* northeast, * northwest, * southeast, * southwest;
 	vector<point> points;
+	vector<string> types;
 	int capacity = 10;
 	bool isDivided = false;
 

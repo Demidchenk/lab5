@@ -10,6 +10,8 @@ void rtree::insert(point p)
     if (points.size() < capacity)
     {
         points.push_back(p);
+        if (find(types.begin(), types.end(), p.type) != types.end())
+            types.push_back(p.type);
         return;
     }
 
@@ -58,11 +60,12 @@ void rtree::makeTree(string fileName)
 
 void rtree::findPoints(double x, double y, double radius, string type, vector<point> &result)
 {
-    for (int i = 0; i < points.size(); i++)
-    {
-        if (distance(x, y, points[i].x, points[i].y) <= radius && points[i].type == type)
+    if (find(types.begin(), types.end(), type) != types.end())
+        for (int i = 0; i < points.size(); i++)
+        {
+            if (distance(x, y, points[i].x, points[i].y) <= radius && points[i].type == type)
             result.push_back(points[i]);
-    }
+        }
     if (isDivided)
     {
         if (distance(x, y, (x1 + x2) / 2, (y1 + y2) / 2) < radius)
