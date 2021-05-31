@@ -34,7 +34,7 @@ void rtree::makeTree(string fileName)
 	double lon, lat;
 	string typ, styp, nam, adr, temp;
     getline(input, temp);
-    do
+    while (!input.eof() && temp != "")
     {
         while (temp.find(',') != -1)
             temp[temp.find(',')] = '.';
@@ -53,7 +53,7 @@ void rtree::makeTree(string fileName)
         point p(lat, lon, typ, styp, nam, adr);
         this->insert(p);
         getline(input, temp);
-    } while (!input.eof() && temp != "");
+    }
 }
 
 void rtree::findPoints(double x, double y, double radius, string type, vector<point> &result)

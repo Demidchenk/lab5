@@ -17,5 +17,5 @@ int main()
 
     cout << "We found next entities in the sector:\n";
     for (int i = 0; i < result.size(); i++)
-        cout << i + 1 << ". " << result[i].name << " " << result[i].adress << endl;
+        cout << i + 1 << ". " << result[i].subtype << ", " << result[i].name << ", " << result[i].adress << endl;
 }
